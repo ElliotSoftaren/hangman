@@ -14,8 +14,10 @@ namespace Hangman
         static void Main(string[] args)
         {
             WebClient client = new WebClient();
-            string response = client.DownloadString("https://random-word-api.herokuapp.com/word?length=7");
-            string secretWord = response.Trim('[', ']', '"');
+            string wordListText = client.DownloadString("https://gist.githubusercontent.com/ElliotSoftaren/4eca0dfda93a394bb3fdb4c79461f089/raw/2bfbd1811e115ab370557c8caf65c45915bddbaa/hangman-words-7letter.txt");
+            string[] words = wordListText.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            Random rnd = new Random();
+            string secretWord = words[rnd.Next(words.Length)];
 
             int asciiChoose, playOrQuit;
             string asciiArt, stringGuess, wrongGuesses;
@@ -71,14 +73,8 @@ namespace Hangman
                     Console.WriteLine("");
                     Console.WriteLine("Wrong guesses: " + wrongGuesses);
                 }
-                
-                if (letter1 == secretLetter1 && letter2 == secretLetter2 && letter3 == secretLetter3 && letter4 == secretLetter4 && letter5 == secretLetter5 && letter6 == secretLetter6 && letter7 == secretLetter7)
-                {
-                    Console.Clear();
-                    Console.WriteLine("Congratulations, you won!");
-                }
 
-                else if (wrongGuesses.Contains(guess.ToString()) || guess == letter1 || guess == letter2 || guess == letter3 || guess == letter4 || guess == letter5 || guess == letter6 || guess == letter7)
+                if (wrongGuesses.Contains(guess.ToString()) || guess == letter1 || guess == letter2 || guess == letter3 || guess == letter4 || guess == letter5 || guess == letter6 || guess == letter7)
                 {
                     Console.Clear();
                     Console.WriteLine("You already guessed that letter! Try a different one.\n");
@@ -93,7 +89,6 @@ namespace Hangman
                 else if (asciiChoose == 8)
                 {
                     asciiArt = ("  +---+\r\n  |   |\r\n  O   |\r\n /|\\  |\r\n / \\  |\r\n      |\r\n=========");
-
                     Console.Clear();
                     Console.WriteLine("You lost! The correct word was " + secretWord + ".\n");
                     Console.WriteLine(asciiArt);
@@ -110,9 +105,7 @@ namespace Hangman
 
                     if (playOrQuit == 1)
                     {
-                        response = client.DownloadString("https://random-word-api.herokuapp.com/word?length=7");
-                        secretWord = response.Trim('[', ']', '"');
-
+                        secretWord = words[rnd.Next(words.Length)];
                         secretLetter1 = secretWord[0];
                         secretLetter2 = secretWord[1];
                         secretLetter3 = secretWord[2];
@@ -120,14 +113,11 @@ namespace Hangman
                         secretLetter5 = secretWord[4];
                         secretLetter6 = secretWord[5];
                         secretLetter7 = secretWord[6];
-
                         letter1 = letter2 = letter3 = letter4 = letter5 = letter6 = letter7 = '_';
-
                         asciiChoose = 0;
                         wrongGuesses = "";
                         stringGuess = $" {letter1}{letter2}{letter3}{letter4}{letter5}{letter6}{letter7}";
                         asciiArt = ("\r\n\r\n\r\n \r\n \r\n \r\n=========");
-
                         Console.Clear();
                         Console.WriteLine("Guess a letter.\n");
                         Console.WriteLine(asciiArt);
@@ -155,8 +145,57 @@ namespace Hangman
                     if (guess == secretLetter5) { letter5 = secretLetter5; }
                     if (guess == secretLetter6) { letter6 = secretLetter6; }
                     if (guess == secretLetter7) { letter7 = secretLetter7; }
-
                     stringGuess = $" {letter1}{letter2}{letter3}{letter4}{letter5}{letter6}{letter7}";
+
+                    if (letter1 == secretLetter1 && letter2 == secretLetter2 && letter3 == secretLetter3 && letter4 == secretLetter4 && letter5 == secretLetter5 && letter6 == secretLetter6 && letter7 == secretLetter7)
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Congratulations, you won! The word was " + secretWord + ".\n");
+                        Console.WriteLine(asciiArt);
+                        Console.WriteLine("");
+                        Console.WriteLine(stringGuess);
+                        Console.WriteLine("");
+                        Console.WriteLine("Enter 1 to play again, else to quit.");
+                        while (!int.TryParse(Console.ReadLine(), out playOrQuit))
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Invalid character!\n");
+                            Console.WriteLine("Enter 1 to play again, else to quit.");
+                        }
+
+                        if (playOrQuit == 1)
+                        {
+                            secretWord = words[rnd.Next(words.Length)];
+                            secretLetter1 = secretWord[0];
+                            secretLetter2 = secretWord[1];
+                            secretLetter3 = secretWord[2];
+                            secretLetter4 = secretWord[3];
+                            secretLetter5 = secretWord[4];
+                            secretLetter6 = secretWord[5];
+                            secretLetter7 = secretWord[6];
+                            letter1 = letter2 = letter3 = letter4 = letter5 = letter6 = letter7 = '_';
+                            asciiChoose = 0;
+                            wrongGuesses = "";
+                            stringGuess = $" {letter1}{letter2}{letter3}{letter4}{letter5}{letter6}{letter7}";
+                            asciiArt = ("\r\n\r\n\r\n \r\n \r\n \r\n=========");
+                            Console.Clear();
+                            Console.WriteLine("Guess a letter.\n");
+                            Console.WriteLine(asciiArt);
+                            Console.WriteLine("");
+                            Console.WriteLine(stringGuess);
+                            Console.WriteLine("");
+                            Console.WriteLine("Wrong guesses: " + wrongGuesses);
+                            continue;
+                        }
+
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("See you next time.");
+                            Thread.Sleep(3000);
+                            break;
+                        }
+                    }
 
                     Console.Clear();
                     Console.WriteLine("Correct letter! Guess another letter.\n");
@@ -165,7 +204,6 @@ namespace Hangman
                     Console.WriteLine(stringGuess);
                     Console.WriteLine("");
                     Console.WriteLine("Wrong guesses: " + wrongGuesses);
-
                     continue;
                 }
 
@@ -173,7 +211,6 @@ namespace Hangman
                 {
                     wrongGuesses += guess + " ";
                     asciiChoose += 1;
-
                     if (asciiChoose == 0) { asciiArt = ("\r\n\r\n\r\n \r\n \r\n \r\n========="); }
                     if (asciiChoose == 1) { asciiArt = ("      +\r\n      |\r\n      |\r\n      |\r\n      |\r\n      |\r\n========="); }
                     if (asciiChoose == 2) { asciiArt = ("  +---+\r\n      |\r\n      |\r\n      |\r\n      |\r\n      |\r\n========="); }
@@ -184,7 +221,6 @@ namespace Hangman
                     if (asciiChoose == 7) { asciiArt = ("  +---+\r\n  |   |\r\n  O   |\r\n /|\\  |\r\n      |\r\n      |\r\n========="); }
                     if (asciiChoose == 8) { asciiArt = ("  +---+\r\n  |   |\r\n  O   |\r\n /|\\  |\r\n /    |\r\n      |\r\n========="); }
                     if (asciiChoose == 9) { asciiArt = ("  +---+\r\n  |   |\r\n  O   |\r\n /|\\  |\r\n / \\  |\r\n      |\r\n========="); }
-
                     Console.Clear();
                     Console.WriteLine("Wrong letter! Guess another letter.\n");
                     Console.WriteLine(asciiArt);
@@ -192,7 +228,7 @@ namespace Hangman
                     Console.WriteLine(stringGuess);
                     Console.WriteLine("");
                     Console.WriteLine("Wrong guesses: " + wrongGuesses);
-                }            
+                }
             }
         }
     }
